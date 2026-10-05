@@ -84,7 +84,7 @@ if (!documentId) {
   throw new Error("Document ID was not returned after upload");
 }
 setMessage("PDF uploaded. Processing document...");
-const processResponse = await fetch(" /api/documents/process",{
+const processResponse = await fetch("/api/documents/process",{
   method :"POST",
   headers:{
     "Content-Type" : "application/json"
