@@ -2,7 +2,6 @@
 import { pool } from "@/lib/db";
 import { gemini } from "@/lib/openai";
 import { NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
 
 export async function POST(request:Request){
 
