@@ -1,7 +1,7 @@
 import { pool } from "@/lib/db";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
+// import { PDFParse } from "pdf-parse";
 import { ChunkText } from "@/lib/chunk-text";
 export const runtime = "nodejs";
 
@@ -50,10 +50,14 @@ try{
       }
       //3. convert blob to buffer
       const arrayBuffer = await data.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+    //   const uint8Array = new Uint8Array(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
+
 
       //4. Extract PDF text
-      const pdfData = new PDFParse({data :uint8Array});
+    //   const pdfData = new PDFParse({data :uint8Array});
+    const { PDFParse } = await import("pdf-parse");
+     const pdfData = new PDFParse({ data: buffer });
       const info = await pdfData.getInfo();
       const text = await pdfData.getText({
        pageJoiner: "\n---PAGE_{page_number}---\n",
@@ -81,7 +85,7 @@ try{
       }
 
       return NextResponse.json({
-        status :200,
+        success :true,
         documentId :document.id,
         fileName :document.file_name,
         pages :info.total,
