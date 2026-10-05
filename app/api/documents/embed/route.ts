@@ -17,6 +17,7 @@ export async function POST(request :Request){
         const result = await pool.query(
             `SELECT id, context FROM document_chunks
                WHERE document_id =$1
+               AND embedding IS NULL
                ORDER BY created_at`,
                [documentId]
         );

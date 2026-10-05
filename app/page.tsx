@@ -69,6 +69,7 @@ export default function Home() {
       setMessage("");
     const formData =new FormData();
     formData.append("file", selectedFile)
+    
     const response = await fetch("/api/documents/upload",{
       method :"POST",
       body : formData
@@ -76,7 +77,54 @@ export default function Home() {
     const data = await response.json();
     if(!response.ok){
       throw new Error(data.message || "Upload Failed")
-    } setMessage("PDF Uploaded Successfully")
+    } 
+    const documentId = data.document?.id;
+
+if (!documentId) {
+  throw new Error("Document ID was not returned after upload");
+}
+setMessage("PDF uploaded. Processing document...");
+const processResponse = await fetch(" /api/documents/process",{
+  method :"POST",
+  headers:{
+    "Content-Type" : "application/json"
+  },
+  body :JSON.stringify({
+    documentId,
+  }),
+});
+const processData = await processResponse.json();
+if (!processResponse.ok) {
+  throw new Error(
+    processData.message || "Failed to process document"
+  );
+}
+    setMessage("PDF Processed. Generating Embeddings...")
+
+   const embedResponse = await fetch(
+  "/api/documents/embed",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      documentId,
+    }),
+  }
+);
+
+const embedData = await embedResponse.json();
+
+if (!embedResponse.ok) {
+  throw new Error(
+    embedData.message ||
+      "Failed to generate embeddings"
+  );
+}
+    setMessage(
+  "PDF uploaded, processed and embedded successfully"
+);
       setSelectedFile(null);
     }catch(error){
       console.log("Upload error", error)
@@ -99,6 +147,7 @@ export default function Home() {
       setAskMessage("");
       setAnswer("");
       setSources([]);
+
       const response = await fetch("/api/ask",{
          method :"POST",
          headers:{
@@ -199,7 +248,7 @@ className="mt-4 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white dis
 </button>  
 {/*Error/ status */}
 {askMessage && (
-  <p>{askMessage}</p>
+  <p className="mt-2 text-red-500">{askMessage}</p>
 )}
                 </div>
                 {answer && (
